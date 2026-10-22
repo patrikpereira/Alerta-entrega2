@@ -1,47 +1,35 @@
-name: Compilar APK do Alerta Entrega
 
-'on':
+name: Gerar APK de teste
+
+on:
   push:
     branches:
       - main
-      - master
   workflow_dispatch:
-
-permissions:
-  contents: read
 
 jobs:
   build:
-    name: Gerar APK de teste
     runs-on: ubuntu-latest
+
     steps:
-      - name: Baixar o repositório
+      - name: Baixar código
         uses: actions/checkout@v4
 
-      - name: Preparar Java 17
+      - name: Configurar Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
-      - name: Preparar Gradle 8.9
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.9'
+      - name: Extrair projeto
+        run: |
+          unzip -o AlertaEntrega-prototipo.zip -d .
 
-      - name: Conferir se o ZIP existe
-        run: test -f AlertaEntrega-prototipo.zip
-
-      - name: Extrair o projeto Android do ZIP
-        run: unzip -o AlertaEntrega-prototipo.zip
-
-      - name: Compilar APK de depuração
+      - name: Gerar APK
         run: gradle -p AlertaEntrega assembleDebug
 
-      - name: Disponibilizar APK para download
+      - name: Disponibilizar APK
         uses: actions/upload-artifact@v4
         with:
-          name: Alerta-Entrega-APK-debug
+          name: AlertaEntrega-APK
           path: AlertaEntrega/app/build/outputs/apk/debug/app-debug.apk
-          if-no-files-found: error
-          retention-days: 14
