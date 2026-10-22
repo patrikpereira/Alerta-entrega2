@@ -1,10 +1,10 @@
 
+
 name: Gerar APK de teste
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -21,14 +21,22 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Extrair projeto
+      - name: Extrair e localizar projeto
         run: |
           unzip -o AlertaEntrega-prototipo.zip -d .
+          echo "Arquivos na raiz:"
+          ls -la
+          test -f AlertaEntrega/settings.gradle.kts
 
-      - name: Gerar APK
+      - name: Configurar Gradle 8.9
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Compilar APK
         run: gradle -p AlertaEntrega assembleDebug
 
-      - name: Disponibilizar APK
+      - name: Publicar APK
         uses: actions/upload-artifact@v4
         with:
           name: AlertaEntrega-APK
